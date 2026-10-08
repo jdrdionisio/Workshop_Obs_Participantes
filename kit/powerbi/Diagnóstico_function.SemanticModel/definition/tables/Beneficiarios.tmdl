@@ -1,0 +1,124 @@
+table Beneficiarios
+	lineageTag: 73e65ece-4236-4479-9ab5-f1b26e16e5c2
+
+	measure Percentage = DIVIDE(SUM(Beneficiarios[valor]), SUM(Beneficiarios[pop]), 0) * 100
+		formatString: 0
+		lineageTag: d60c2199-7973-464e-a6ea-bc700dc35f94
+
+	column Name
+		dataType: int64
+		formatString: 0
+		lineageTag: 1f06965d-804b-4b90-bc39-acc10751adcb
+		summarizeBy: sum
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column geocod
+		dataType: string
+		lineageTag: 8ded5443-bdf7-4b12-8c57-6501937d5ce2
+		summarizeBy: none
+		sourceColumn: geocod
+
+		annotation SummarizationSetBy = Automatic
+
+	column geodsg
+		dataType: string
+		lineageTag: a1bfb738-a1f1-449f-b242-b063c925d8b2
+		summarizeBy: none
+		sourceColumn: geodsg
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_3
+		dataType: string
+		lineageTag: 0226d7e1-d622-4608-894c-09844ea0ee32
+		summarizeBy: none
+		sourceColumn: dim_3
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_3_t
+		dataType: string
+		lineageTag: d4cfb8a4-cbda-4cd2-9fa0-a31eaba00f78
+		summarizeBy: none
+		sourceColumn: dim_3_t
+
+		annotation SummarizationSetBy = Automatic
+
+	column ind_string
+		dataType: string
+		lineageTag: 7ae75450-b128-4e04-a4f3-9eae04bd270e
+		summarizeBy: none
+		sourceColumn: ind_string
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor
+		dataType: int64
+		formatString: 0
+		lineageTag: c85e7a66-83b2-4090-bd98-54f095f72ac8
+		summarizeBy: sum
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Name.1'
+		dataType: string
+		lineageTag: daef22ca-a8c6-4283-aba8-aae0f7c3adfa
+		summarizeBy: none
+		sourceColumn: Name.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'geocod.1'
+		dataType: string
+		lineageTag: 9db9dcd3-9a8b-4291-9d85-2492cfd9613e
+		summarizeBy: none
+		sourceColumn: geocod.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'geodsg.1'
+		dataType: string
+		lineageTag: e9914019-853f-4cc8-a8a4-762b9c164ea5
+		summarizeBy: none
+		sourceColumn: geodsg.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'dim_3_t.1'
+		dataType: string
+		lineageTag: 82c5cc0f-35a7-4144-82e5-c515ed31cdab
+		summarizeBy: none
+		sourceColumn: dim_3_t.1
+
+		annotation SummarizationSetBy = Automatic
+
+	column pop
+		dataType: int64
+		formatString: 0
+		lineageTag: 1aac2cf9-1a24-4e96-9153-a40441c9ae6f
+		summarizeBy: sum
+		sourceColumn: pop
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Beneficiarios = m
+		mode: import
+		source =
+				let
+				    Source = GetINEData_NDNY("0010291"),
+				    #"Expanded Value" = Table.ExpandRecordColumn(Source, "Value", {"geocod", "geodsg", "dim_3", "dim_3_t", "ind_string", "valor"}, {"geocod", "geodsg", "dim_3", "dim_3_t", "ind_string", "valor"}),
+				    #"Merged Queries" = Table.NestedJoin(#"Expanded Value", {"Name", "geocod", "geodsg", "dim_3_t"}, pop_residente, {"Name", "geocod", "geodsg", "dim_3_t"}, "pop_residente", JoinKind.LeftOuter),
+				    #"Expanded pop_residente" = Table.ExpandTableColumn(#"Merged Queries", "pop_residente", {"Name", "geocod", "geodsg", "dim_3_t", "valor"}, {"Name.1", "geocod.1", "geodsg.1", "dim_3_t.1", "valor.1"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Expanded pop_residente",{{"valor.1", Int64.Type}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"valor.1", "pop"}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns",{{"valor", Int64.Type}, {"Name", Int64.Type}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

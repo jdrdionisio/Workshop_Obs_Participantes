@@ -1,0 +1,162 @@
+table Obitos_uls
+	lineageTag: cdc611e3-5592-4560-a04a-a8dca898b5f6
+
+	column Name
+		dataType: string
+		lineageTag: af8b74c1-a774-4576-90f3-4f689ea38656
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.geocod'
+		dataType: string
+		lineageTag: e0a915ae-84f1-4ebd-ae7c-f93f284e5f1b
+		summarizeBy: none
+		sourceColumn: Value.geocod
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.geodsg'
+		dataType: string
+		lineageTag: 0e05cc5e-28bc-4d20-a9f7-3307cb058fd6
+		summarizeBy: none
+		sourceColumn: Value.geodsg
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.dim_3'
+		dataType: string
+		lineageTag: c7524d0c-e5ef-401e-8bf3-64b38c818f4d
+		summarizeBy: none
+		sourceColumn: Value.dim_3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.dim_3_t'
+		dataType: string
+		lineageTag: 298e8b91-226f-4d55-84b9-5877abf1b250
+		summarizeBy: none
+		sourceColumn: Value.dim_3_t
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.dim_4'
+		dataType: string
+		lineageTag: e65e1758-4112-457c-b627-4a2c81f860d5
+		summarizeBy: none
+		sourceColumn: Value.dim_4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.dim_4_t'
+		dataType: string
+		lineageTag: 3b699427-7fb3-4f75-9918-3e7ec97a0ebc
+		summarizeBy: none
+		sourceColumn: Value.dim_4_t
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.dim_5'
+		dataType: string
+		lineageTag: b4a98ded-9126-445d-b3ec-b4e0c3a06fcb
+		summarizeBy: none
+		sourceColumn: Value.dim_5
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.dim_5_t'
+		dataType: string
+		lineageTag: 26272091-78b2-41b2-a435-80025a76c1da
+		summarizeBy: none
+		sourceColumn: Value.dim_5_t
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.ind_string'
+		dataType: string
+		lineageTag: 4ccc1251-3607-4889-b484-8f9f5284fcdb
+		summarizeBy: none
+		sourceColumn: Value.ind_string
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Value.valor'
+		dataType: double
+		lineageTag: 061fd797-acbf-4f48-a031-cf8d3fc8e5ff
+		summarizeBy: sum
+		sourceColumn: Value.valor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Grupo
+		dataType: string
+		lineageTag: bc06f433-d217-475c-b1c8-25c1494775e2
+		summarizeBy: none
+		sourceColumn: Grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo_t
+		dataType: string
+		lineageTag: 08509335-7c6e-4555-866a-7527de73d58e
+		summarizeBy: none
+		sourceColumn: Grupo_t
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo_tT
+		dataType: string
+		lineageTag: 1517c123-8833-4fa8-b656-1185f16e8b45
+		summarizeBy: none
+		sourceColumn: Grupo_tT
+
+		annotation SummarizationSetBy = Automatic
+
+	column Local
+		dataType: string
+		lineageTag: 5cdd6ef8-300b-4333-868f-3dfe0f9167fa
+		summarizeBy: none
+		sourceColumn: Local
+
+		annotation SummarizationSetBy = Automatic
+
+	column Idade
+		dataType: string
+		lineageTag: aee00338-4bd5-499c-aa4c-17c54f345e5b
+		summarizeBy: none
+		sourceColumn: Idade
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Obitos_uls = m
+		mode: import
+		source =
+				let
+				    Dim2Codes =  {"16E0111", "16E0602", "16E0603", "16E0604", "16E0608", "16E0613", "16E1808", "16E0601", "16E0606", "16E0607", "16E0609", "16E0611", "16E0612", "16E0614", "16E0616", "16E0617", "16F1002", "16F1003", "16F1007", "16F1008", "16F1013", "1", "16"}, // List your Dim2 codes here
+				    GetData = List.Transform(Dim2Codes, each GetINEData(_,"0008206","S7A2021")),
+				    #"Converted to Table" = Table.FromList(GetData, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    #"Expanded Column1" = Table.ExpandTableColumn(#"Converted to Table", "Column1", {"Name", "Value"}, {"Name", "Value"}),
+				    #"Expanded Value1" = Table.ExpandRecordColumn(#"Expanded Column1", "Value", {"geocod", "geodsg", "dim_3", "dim_3_t", "dim_4", "dim_4_t", "dim_5", "dim_5_t", "ind_string", "valor"}, {"Value.geocod", "Value.geodsg", "Value.dim_3", "Value.dim_3_t", "Value.dim_4", "Value.dim_4_t", "Value.dim_5", "Value.dim_5_t", "Value.ind_string", "Value.valor"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Expanded Value1",{{"Value.valor", Int64.Type}}),
+				    #"Added Conditional Column" = Table.AddColumn(#"Changed Type", "Custom", each if [Value.dim_5] = "01" then 0 else if [Value.dim_5] = "02" then 0 else if [Value.dim_5] = "03" then 0 else if [Value.dim_5] = "04" then 0 else if [Value.dim_5] = "05" then 0 else if [Value.dim_5] = "26" then 2 else if [Value.dim_5] = "27" then 2 else if [Value.dim_5] = "28" then 3 else if [Value.dim_5] = "29" then 3 else if [Value.dim_5] = "30" then 3 else if [Value.dim_5] = "31" then 4 else if [Value.dim_5] = "32" then 4 else if [Value.dim_5] = "33" then 5 else if [Value.dim_5] = "34" then 5 else if [Value.dim_5] = "35" then 5 else if [Value.dim_5] = "36" then 5 else if [Value.dim_5] = "37" then 6 else if [Value.dim_5] = "38" then 6 else if [Value.dim_5] = "39" then 6 else if [Value.dim_5] = "40" then 6 else if [Value.dim_5] = "41" then 6 else if [Value.dim_5] = "42" then 7 else if [Value.dim_5] = "43" then 7 else if [Value.dim_5] = "44" then 7 else if [Value.dim_5] = "45" then 8 else if [Value.dim_5] = "46" then 9 else if [Value.dim_5] = "47" then 9 else if [Value.dim_5] = "48" then 10 else if [Value.dim_5] = "49" then 10 else if [Value.dim_5] = "51" then 11 else if [Value.dim_5] = "52" then 12 else if [Value.dim_5] = "53" then 12 else if [Value.dim_5] = "54" then 12 else if [Value.dim_5] = "55" then 13 else if [Value.dim_5] = "56" then 13 else if [Value.dim_5] = "57" then 13 else if [Value.dim_5] = "58" then 14 else if [Value.dim_5] = "59" then 14 else if [Value.dim_5] = "60" then 14 else if [Value.dim_5] = "61" then 14 else if [Value.dim_5] = "62" then 14 else if [Value.dim_5] = "63" then 14 else if [Value.dim_5] = "64" then 14 else if [Value.dim_5] = "65" then 14 else if [Value.dim_5] = "TLES" then "15" else 1, type any),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Conditional Column",{{"Custom", "Grupo"}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each true),
+				    #"Added Conditional Column1" = Table.AddColumn(#"Filtered Rows", "Custom", each if [Value.dim_5_t] = "Tuberculose" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Infecção meningocócica" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Doenças pelo vírus da imunodeficiência humana [HIV]" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Hepatite viral" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Tumores (neoplasmas) malignos" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do lábio, cavidade bucal e faringe" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do esófago" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do estômago" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do cólon" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno (neoplasma) da junção retossigmoideia, reto, ânus e canal anal" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do fígado e das vias biliares intra-hepáticas" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do pâncreas" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da laringe, da traqueia, dos brônquios e dos pulmões" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Melanoma maligno da pele" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da mama" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da próstata" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do rim, excepto pelve renal" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da bexiga" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do tecido linfático e hematopoético e tecidos relacionados" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Doenças do sangue e dos órgãos hematopoéticos e alguns transtornos imunitários" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Diabetes mellitus" then "Doenças endócrinas, nutricionais e metabólicas" else if [Value.dim_5_t] = "Transtornos mentais e comportamentais devidos ao uso de álcool" then "Transtornos mentais e comportamentais" else if [Value.dim_5_t] = "Dependência de drogas (toxicomania)" then "Transtornos mentais e comportamentais" else if [Value.dim_5_t] = "Meningites (excepto 03 - Infecção meningocócica)" then "Doenças do sistema nervoso e dos órgãos dos sentidos" else if [Value.dim_5_t] = "Doenças isquémicas do coração" then "Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Outras doenças cardíacas (excepto transtornos valvulares não-reumáticos e doenças valvulares)" then "Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Doenças cérebro-vasculares" then "Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Gripe (Influenza)" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Pneumonia" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Doenças crónicas das vias aéreas inferiores" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Asma e estado de mal asmático" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Úlcera gástrica, duodenal, péptica de localização não especificada e gastrojejunal" then "Doenças do aparelho digestivo" else if [Value.dim_5_t] = "Doenças crónicas do fígado" then "Doenças do aparelho digestivo" else if [Value.dim_5_t] = "Artrites reumatóides e artroses" then "Doenças do sistema osteomuscular/ tecido conjuntivo" else if [Value.dim_5_t] = "Doenças do rim e ureter" then "Doenças do aparelho geniturinário" else if [Value.dim_5_t] = "Malformações congénitas do sistema nervoso" then "Malformações congénitas, deformidades e anomalias cromossómicas" else if [Value.dim_5_t] = "Malformações congénitas do aparelho circulatório" then "Malformações congénitas, deformidades e anomalias cromossómicas" else if [Value.dim_5_t] = "Síndrome de morte súbita do lactente" then "Sintomas, sinais e achados anormais de exames clínicos e de laboratório não classificados em outra parte" else if [Value.dim_5_t] = "Outras mortes súbitas de causa desconhecida, mortes sem assistência, outras causas mal definidas e as não especificadas" then "Sintomas, sinais e achados anormais de exames clínicos e de laboratório não classificados em outra parte" else if [Value.dim_5_t] = "Acidentes" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Acidentes de transporte" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Quedas acidentais" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Envenenamento (intoxicação) acidental por drogas, medicamentos e substâncias biológicas" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Suicídios e lesões autoprovocadas voluntariamente" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Homicídios e lesões provocadas intencionalmente por outras pessoas" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Lesões em que se ignora se foram acidental ou intencionalmente infligidas" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Algumas doenças infeciosas e parasitárias" then "T- Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Tumores (neoplasmas)" then "T- Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumores (neoplasmas) malignos" then "T- Tumores (neoplasmas) malignos" else if [Value.dim_5_t] = "Doenças endócrinas, nutricionais e metabólicas" then "T- Doenças endócrinas, nutricionais e metabólicas" else if [Value.dim_5_t] = "Transtornos mentais e comportamentais" then "T- Transtornos mentais e comportamentais" else if [Value.dim_5_t] = "Doenças do sistema nervoso e dos órgãos dos sentidos" then "T- Doenças do sistema nervoso e dos órgãos dos sentidos" else if [Value.dim_5_t] = "Doenças do aparelho circulatório" then "T- Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Doenças do aparelho digestivo" then "T- Doenças do aparelho digestivo" else if [Value.dim_5_t] = "Doenças do sistema osteomuscular/ tecido conjuntivo" then "T- Doenças do sistema osteomuscular/ tecido conjuntivo" else if [Value.dim_5_t] = "Doenças do aparelho geniturinário" then "Doenças do aparelho geniturinário" else if [Value.dim_5_t] = "Malformações congénitas, deformidades e anomalias cromossómicas" then "T- Malformações congénitas, deformidades e anomalias cromossómicas" else if [Value.dim_5_t] = "Sintomas, sinais e achados anormais de exames clínicos e de laboratório não classificados em outra parte" then "T- Sintomas, sinais e achados anormais de exames clínicos e de laboratório não classificados em outra parte" else if [Value.dim_5_t] = "Causas externas de lesão e envenenamento" then "T- Causas externas de lesão e envenenamento" else [Value.dim_5_t], type text),
+				        #"Added Conditional Column2" = Table.AddColumn(#"Added Conditional Column1", "Custom1", each if [Value.dim_5_t] = "Tuberculose" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Infecção meningocócica" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Doenças pelo vírus da imunodeficiência humana [HIV]" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Hepatite viral" then "Algumas doenças infeciosas e parasitárias" else if [Value.dim_5_t] = "Tumores (neoplasmas) malignos" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do lábio, cavidade bucal e faringe" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do esófago" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do estômago" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do cólon" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno (neoplasma) da junção retossigmoideia, reto, ânus e canal anal" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do fígado e das vias biliares intra-hepáticas" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do pâncreas" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da laringe, da traqueia, dos brônquios e dos pulmões" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Melanoma maligno da pele" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da mama" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da próstata" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do rim, excepto pelve renal" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno da bexiga" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Tumor (neoplasma) maligno do tecido linfático e hematopoético e tecidos relacionados" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Doenças do sangue e dos órgãos hematopoéticos e alguns transtornos imunitários" then "Tumores (neoplasmas)" else if [Value.dim_5_t] = "Diabetes mellitus" then "Doenças endócrinas, nutricionais e metabólicas" else if [Value.dim_5_t] = "Transtornos mentais e comportamentais devidos ao uso de álcool" then "Transtornos mentais e comportamentais" else if [Value.dim_5_t] = "Dependência de drogas (toxicomania)" then "Transtornos mentais e comportamentais" else if [Value.dim_5_t] = "Meningites (excepto 03 - Infecção meningocócica)" then "Doenças do sistema nervoso e dos órgãos dos sentidos" else if [Value.dim_5_t] = "Doenças isquémicas do coração" then "Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Outras doenças cardíacas (excepto transtornos valvulares não-reumáticos e doenças valvulares)" then "Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Doenças cérebro-vasculares" then "Doenças do aparelho circulatório" else if [Value.dim_5_t] = "Gripe (Influenza)" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Pneumonia" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Doenças crónicas das vias aéreas inferiores" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Asma e estado de mal asmático" then "Doenças do aparelho respiratório" else if [Value.dim_5_t] = "Úlcera gástrica, duodenal, péptica de localização não especificada e gastrojejunal" then "Doenças do aparelho digestivo" else if [Value.dim_5_t] = "Doenças crónicas do fígado" then "Doenças do aparelho digestivo" else if [Value.dim_5_t] = "Artrites reumatóides e artroses" then "Doenças do sistema osteomuscular/ tecido conjuntivo" else if [Value.dim_5_t] = "Doenças do rim e ureter" then "Doenças do aparelho geniturinário" else if [Value.dim_5_t] = "Malformações congénitas do sistema nervoso" then "Malformações congénitas, deformidades e anomalias cromossómicas" else if [Value.dim_5_t] = "Malformações congénitas do aparelho circulatório" then "Malformações congénitas, deformidades e anomalias cromossómicas" else if [Value.dim_5_t] = "Síndrome de morte súbita do lactente" then "Sintomas, sinais e achados anormais de exames clínicos e de laboratório não classificados em outra parte" else if [Value.dim_5_t] = "Outras mortes súbitas de causa desconhecida, mortes sem assistência, outras causas mal definidas e as não especificadas" then "Sintomas, sinais e achados anormais de exames clínicos e de laboratório não classificados em outra parte" else if [Value.dim_5_t] = "Acidentes" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Acidentes de transporte" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Quedas acidentais" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Envenenamento (intoxicação) acidental por drogas, medicamentos e substâncias biológicas" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Suicídios e lesões autoprovocadas voluntariamente" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Homicídios e lesões provocadas intencionalmente por outras pessoas" then "Causas externas de lesão e envenenamento" else if [Value.dim_5_t] = "Lesões em que se ignora se foram acidental ou intencionalmente infligidas" then "Causas externas de lesão e envenenamento" else [Value.dim_5_t], type text),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Added Conditional Column2",{{"Custom", "Grupo_t"},{"Custom1", "Grupo_tT"}}),
+				    #"Added Conditional Column3" = Table.AddColumn(#"Renamed Columns1", "Local", each if [Value.geodsg] = "Continente" then "Continente" else if [Value.geodsg] = "Centro" then "Centro" else "ULS de Coimbra"),
+				    #"Added Conditional Column4" = Table.AddColumn(#"Added Conditional Column3", "Idade", each if [Value.dim_4_t] = "Menos de 1 ano" then "<1 ano" else if [Value.dim_4_t] = "1 - 4 anos" then "01 - 04 anos" else if [Value.dim_4_t] = "5 - 9 anos" then "05 - 09 anos" else [Value.dim_4_t], type text),
+				    #"Filtered Rows2" = Table.SelectRows(#"Added Conditional Column4", each ([Value.dim_5_t] <> "Tumores (neoplasmas) malignos")),
+				    #"Appended Query" = Table.Combine({#"Filtered Rows2", Obitos_uls_T}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Appended Query","H","Masculino",Replacer.ReplaceValue,{"Value.dim_3_t"}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","M","Feminino",Replacer.ReplaceValue,{"Value.dim_3_t"})
+				in
+				    #"Replaced Value2"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

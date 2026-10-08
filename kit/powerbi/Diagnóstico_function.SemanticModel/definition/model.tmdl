@@ -1,0 +1,24 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-PT
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["GetINEData","GetINEData_NDNY","GetINEData_NY","GetPTRANS","GetPTRANS_v1","GetPTRANS_v3","GetPTRANS_H_v2","GetPTRANS_H","GetPTRANS_CSP_Ent","GetPTRANS_CSP_Aces","GetPTRANS_CSP_Area","GetAPAData","GetIPMAClimateData","GetIPMAData","GetIPMADataT","GetIPMADataR","GetIPMAData_Site","Obitos_uls","Obitos_uls_T","distrits-islands","balnear","Beneficiarios","pop_residente","Query1"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Obitos_uls
+ref table Obitos_uls_T
+ref table distrits-islands
+ref table balnear
+ref table Beneficiarios
+ref table pop_residente
+ref table Query1
+
+ref cultureInfo en-US
+

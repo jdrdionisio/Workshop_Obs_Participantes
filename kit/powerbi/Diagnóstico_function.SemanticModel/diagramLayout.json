@@ -1,0 +1,113 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 337,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "nodeIndex": "distrits-islands",
+          "nodeLineageTag": "22b90777-fbbb-4b59-83cf-65bd2d0ea88e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 568,
+            "y": 0
+          },
+          "nodeIndex": "Obitos_uls",
+          "nodeLineageTag": "cdc611e3-5592-4560-a04a-a8dca898b5f6",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 852,
+            "y": 0
+          },
+          "nodeIndex": "Obitos_uls_T",
+          "nodeLineageTag": "f0a70602-cd16-4a84-840a-fdb01b587cd3",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1136,
+            "y": 0
+          },
+          "nodeIndex": "balnear",
+          "nodeLineageTag": "2de253b4-abc5-4af0-96b6-65c3012f8900",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1420,
+            "y": 0
+          },
+          "nodeIndex": "Beneficiarios",
+          "nodeLineageTag": "73e65ece-4236-4479-9ab5-f1b26e16e5c2",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1704,
+            "y": 50
+          },
+          "nodeIndex": "pop_residente",
+          "nodeLineageTag": "039b90a8-efb9-43e9-adc8-442a2fce2a22",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1988,
+            "y": 98
+          },
+          "nodeIndex": "Query1",
+          "nodeLineageTag": "39b05f49-3943-4768-9810-771e5df1a28d",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

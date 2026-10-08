@@ -1,0 +1,23 @@
+table Query1
+	lineageTag: 39b05f49-3943-4768-9810-771e5df1a28d
+
+	column Query1
+		dataType: string
+		lineageTag: 182c7ed2-6810-41ef-9b42-0c9e6eef7a8a
+		summarizeBy: none
+		sourceColumn: Query1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Query1 = m
+		mode: import
+		source =
+				let
+				    Source = ""
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

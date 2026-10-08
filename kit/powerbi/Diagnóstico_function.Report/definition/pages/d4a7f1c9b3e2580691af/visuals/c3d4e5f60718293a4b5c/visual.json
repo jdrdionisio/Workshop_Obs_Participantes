@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "c3d4e5f60718293a4b5c",
+  "position": {
+    "x": 640,
+    "y": 120,
+    "z": 300,
+    "height": 350,
+    "width": 630,
+    "tabOrder": 300
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Beneficiarios"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "Beneficiarios.Name",
+              "nativeQueryRef": "Name",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Beneficiarios"
+                    }
+                  },
+                  "Property": "Percentage"
+                }
+              },
+              "queryRef": "Beneficiarios.Percentage",
+              "nativeQueryRef": "Percentage"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

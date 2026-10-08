@@ -1,0 +1,305 @@
+expression GetINEData =
+		let
+		    GetINEData = (Dim2Code as text, varcd as text, year as text) as table =>
+		    let
+		        response = Json.Document(Web.Contents("https://www.ine.pt",
+		                    [RelativePath = "/ine/json_indicador/pindica.jsp?op=2&varcd=" & varcd & "&Dim1="& year & "&Dim2=" & Dim2Code & "&lang=PT" ])),
+		        convertedToTable = Table.FromList(response, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+		        expandedColumn1 = Table.ExpandRecordColumn(convertedToTable, "Column1", {"IndicadorCod", "IndicadorDsg", "MetaInfUrl", "DataExtracao", "DataUltimoAtualizacao", "UltimoPref", "Dados", "Sucesso"}, {"IndicadorCod", "IndicadorDsg", "MetaInfUrl", "DataExtracao", "DataUltimoAtualizacao", "UltimoPref", "Dados", "Sucesso"}),
+		        dados = expandedColumn1{0}[Dados],
+		        convertedToTable1 = Record.ToTable(dados),
+		        expandedValue = Table.ExpandListColumn(convertedToTable1, "Value")
+		    in
+		        expandedValue
+		in
+		    GetINEData
+	lineageTag: 6e1da0aa-4df9-45dd-8ed3-c5fce6345da4
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetINEData_NDNY =
+		(varcd as text) as table =>
+		    let
+		        response = Json.Document(Web.Contents("https://www.ine.pt",
+		                [RelativePath = "/ine/json_indicador/pindica.jsp?op=2&varcd="& varcd & "&Dim1=T&lang=PT"]
+		        )),
+		        convertedToTable = Table.FromList(response, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+		        expandedColumn1 = Table.ExpandRecordColumn(convertedToTable, "Column1", {"IndicadorCod", "IndicadorDsg", "MetaInfUrl", "DataExtracao", "DataUltimoAtualizacao", "UltimoPref", "Dados", "Sucesso"}, {"IndicadorCod", "IndicadorDsg", "MetaInfUrl", "DataExtracao", "DataUltimoAtualizacao", "UltimoPref", "Dados", "Sucesso"}),
+		        dados = expandedColumn1{0}[Dados],
+		        convertedToTable1 = Record.ToTable(dados),
+		        expandedValue = Table.ExpandListColumn(convertedToTable1, "Value")
+		    in
+		        expandedValue
+	lineageTag: bece0fa3-ec0e-4534-8188-d4e864691b45
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetINEData_NY =
+		(Dim2Code as text, varcd as text) as table =>
+		    let
+		       response = Json.Document(Web.Contents("https://www.ine.pt",
+		                    [RelativePath = "/ine/json_indicador/pindica.jsp?op=2&varcd=" & varcd & "&Dim1=T&Dim2=" & Dim2Code & "&lang=PT"])),
+		        convertedToTable = Table.FromList(response, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+		        expandedColumn1 = Table.ExpandRecordColumn(convertedToTable, "Column1", {"IndicadorCod", "IndicadorDsg", "MetaInfUrl", "DataExtracao", "DataUltimoAtualizacao", "UltimoPref", "Dados", "Sucesso"}, {"IndicadorCod", "IndicadorDsg", "MetaInfUrl", "DataExtracao", "DataUltimoAtualizacao", "UltimoPref", "Dados", "Sucesso"}),
+		        dados = expandedColumn1{0}[Dados],
+		        convertedToTable1 = Record.ToTable(dados),
+		        expandedValue = Table.ExpandListColumn(convertedToTable1, "Value")
+		    in
+		        expandedValue
+	lineageTag: 0487a8d5-336c-4cfb-ba00-082420edf6e9
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results")
+		    in
+		        expanded1
+	lineageTag: 14b2791e-7962-4d26-9d5a-fa187e84660e
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_v1 =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/" &base & "/records?&limit=-1"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results")
+		    in
+		        expanded1
+	lineageTag: 13d4c983-06a8-45b8-8064-1333430dde4f
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_v3 =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/exports/json?lang=pt&timezone=Europe%2FLondon"])),
+		        expanded1 = Table.FromList(response1, Splitter.SplitByNothing(), null, null, ExtraValues.Error)
+		    in
+		        expanded1
+	lineageTag: a8c17882-2007-45da-9f35-53c67239d261
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_H_v2 =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt",
+		        [RelativePath = "/api/explore/v2.1/catalog/datasets/" & base & "/records?&limit=-1" & "&where=instituicao%20like%20%22Universit%C3%A1rio%20de%20Coimbra%22"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results"),
+		        response2 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt",
+		        [RelativePath = "/api/explore/v2.1/catalog/datasets/" & base & "/records?&limit=-1" & "&where=instituicao%20like%20%22Oncologia%20de%20Coimbra%22"])),
+		        tables2 = Table.FromRecords({response2}),
+		        expanded2= Table.ExpandListColumn(tables2, "results"),
+		        response3 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt",
+		        [RelativePath = "/api/explore/v2.1/catalog/datasets/" & base & "/records?&limit=-1" & "&where=instituicao%20like%20%22Sa%C3%BAde%20de%20Coimbra%22"])),
+		        tables3 = Table.FromRecords({response3}),
+		        expanded3= Table.ExpandListColumn(tables3, "results"),
+		        combine = Table.Combine({expanded1,expanded2, expanded3})
+		    in
+		        combine
+	lineageTag: 6def05d7-0c3f-42bc-b63a-c88f387532d2
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_H =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt",
+		        [RelativePath = "/api/explore/v2.1/catalog/datasets/" & base & "/records?&limit=-1" & "&where=instituicao%20like%20%22Coimbra%22"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results")
+		    in
+		        expanded1
+	lineageTag: 02a3530f-05c6-43d2-b548-9b73200c9510
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_CSP_Ent =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&refine=entidade%3A%22%C3%81rea%20dos%20CSP%20da%20ULS%20Coimbra%22"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results"),
+		        response2 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&refine=entidade%3A%22ACES%20Baixo%20Mondego%22"])),
+		        tables2 = Table.FromRecords({response2}),
+		        expanded2= Table.ExpandListColumn(tables2, "results"),
+		        response3 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&where=entidade%20like%20%22Pinhal%20Interior%20Norte%22"])),
+		        tables3 = Table.FromRecords({response3}),
+		        expanded3= Table.ExpandListColumn(tables3, "results"),
+		        combine = Table.Combine({expanded1,expanded2, expanded3})
+		    in
+		        combine
+	lineageTag: b01bce57-5a38-4173-a2b9-0bdb7bacec7b
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_CSP_Aces =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&refine=aces%3A%22%C3%81rea%20dos%20CSP%20da%20ULS%20Coimbra%22"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results"),
+		        response2 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&refine=aces%3A%22ACES%20Baixo%20Mondego%22"])),
+		        tables2 = Table.FromRecords({response2}),
+		        expanded2= Table.ExpandListColumn(tables2, "results"),
+		        response3 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&where=aces%20like%20%22Pinhal%20Interior%20Norte%22"])),
+		        tables3 = Table.FromRecords({response3}),
+		        expanded3= Table.ExpandListColumn(tables3, "results"),
+		        combine = Table.Combine({expanded1,expanded2, expanded3})
+		    in
+		        combine
+	lineageTag: 2a085a47-193e-41fb-a453-9a752c9cc193
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetPTRANS_CSP_Area =
+		(base as text) as table =>
+		    let
+		        response1 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&refine=area_csp%3A%22%C3%81rea%20dos%20CSP%20da%20ULS%20Coimbra%22"])),
+		        tables1 = Table.FromRecords({response1}),
+		        expanded1= Table.ExpandListColumn(tables1, "results"),
+		        response2 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&refine=area_csp%3A%22ACES%20Baixo%20Mondego%22"])),
+		        tables2 = Table.FromRecords({response2}),
+		        expanded2= Table.ExpandListColumn(tables2, "results"),
+		        response3 = Json.Document(Web.Contents("https://transparencia.sns.gov.pt", [RelativePath = "/api/explore/v2.1/catalog/datasets/"& base & "/records?&limit=-1" & "&where=area_csp%20like%20%22Pinhal%20Interior%20Norte%22"])),
+		        tables3 = Table.FromRecords({response3}),
+		        expanded3= Table.ExpandListColumn(tables3, "results"),
+		        combine = Table.Combine({expanded1,expanded2, expanded3})
+		    in
+		        combine
+	lineageTag: c752b7df-effd-447d-b436-265b12994a27
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetAPAData =
+		(id as text) as table =>
+		  let
+		  // Replace 'qualar.apambiente.pt' with the actual base URL if different
+		  Today = DateTime.ToText(DateTime.LocalNow(), "yyyy-MM-dd"),
+		  // Today's date in YYYY-MM-DD format
+		  Url = Json.Document(Web.Contents("https://qualar.apambiente.pt", [RelativePath = "/api/app.php?type=dados&data=" & Today & "&estacao_id=" & id & "&range=d"])),
+		    // Today's date in YYYY-MM-DD format
+			InitialTable = Table.FromRecords({Url}),
+		    TypedTable = Table.TransformColumnTypes(InitialTable, {{"cats", type any}, {"vals", type any}}),
+		    ExpandedVals = Table.ExpandListColumn(TypedTable, "vals"),
+		    ExpandedColumns = Table.ExpandRecordColumn(ExpandedVals, "vals", {"p", "x", "i", "v"}, {"p", "x", "i", "v"}),
+		    ReplacedDecimal = Table.ReplaceValue(ExpandedColumns, ".", ",", Replacer.ReplaceText, {"v"}),
+		    NewColumn= Table.AddColumn(ReplacedDecimal, "Indicador", each if [p] = 1 then "Dióxido de Azoto" else if [p] = 2 then "Monóxido de Carbono" else if [p] = 4 then "Partículas 10μg" else if [p] = 0 then "Ozono" else if [p] = 6 then "Benzeno" else if [p] = 5 then "Partículas 2,5μg" else if [p] = 3 then "Dióxido de Enxofre" else null),
+		    idTable = Table.AddColumn(NewColumn, "ID", each id),
+		    FinalTable = Table.TransformColumnTypes(idTable, {{"v", type number}})
+		  in
+		    FinalTable
+	lineageTag: 1fbbff3c-fd5f-41cf-b037-b45119b302d7
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetIPMAClimateData =
+		(datasetname as text, datasetcode as text, distrito as text, concquery as text, concelho as text) as table =>
+		  let
+		  Url = Csv.Document(Web.Contents("https://api.ipma.pt", [RelativePath= "/open-data/observation/climate/" & datasetname & "/"& distrito & datasetcode & concquery])),
+		  Initial= Table.PromoteHeaders(Url, [PromoteAllScalars=true]),
+		  FinalTable = Table.AddColumn(Initial, "Concelho", each concelho)
+		  in
+		    FinalTable
+	lineageTag: a179f6c2-900f-47b9-95b5-97597bf4838d
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetIPMAData =
+		(dataseturl as text) as list =>
+		  let
+		  Url = Json.Document(Web.Contents("https://api.ipma.pt", [RelativePath= "/open-data" & dataseturl]))
+		  in
+		    Url
+	lineageTag: 294b3439-5466-4b09-9115-a29055103485
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetIPMADataT =
+		(dataseturl as text) as table =>
+		  let
+		  Url = Json.Document(Web.Contents("https://api.ipma.pt", [RelativePath= "/open-data" & dataseturl]))
+		  in
+		    Url
+	lineageTag: 850d9ea9-646f-4a47-9d62-e6ae70f2b5f7
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetIPMADataR =
+		let
+		    Source = (dataseturl as text) as record =>
+		  let
+		  Url = Json.Document(Web.Contents("https://api.ipma.pt", [RelativePath= "/open-data" & dataseturl]))
+		  in
+		    Url
+		in
+		    Source
+	lineageTag: 743a615a-067a-4c07-b0f9-4d2ce6846753
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression GetIPMAData_Site =
+		(codigo as text, concelho as text) as table =>
+		    let
+		        response = Json.Document(Web.Contents("https://api.ipma.pt",
+		                    [RelativePath = "/public-data/forecast/aggregate/" & codigo & ".json"])),
+		        Table= Table.FromList(response, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+		        Column = Table.ExpandRecordColumn(Table, "Column1", {"tMed", "idTipoTempo", "hR", "dataUpdate", "utci", "ffVento", "globalIdLocal", "probabilidadePrecipita", "idPeriodo", "dataPrev", "ddVento", "tMin", "idFfxVento", "tMax", "iUv", "intervaloHora"}, {"tMed", "idTipoTempo", "hR", "dataUpdate", "utci", "ffVento", "globalIdLocal", "probabilidadePrecipita", "idPeriodo", "dataPrev", "ddVento", "tMin", "idFfxVento", "tMax", "iUv", "intervaloHora"}),
+		        Type = Table.TransformColumnTypes(Column,{{"dataPrev", type datetime}, {"dataUpdate", type datetime}}),
+		        Replace = Table.ReplaceValue(Type,".",",",Replacer.ReplaceValue,{"tMed", "hR", "utci", "ffVento", "probabilidadePrecipita", "tMin", "idFfxVento", "tMax", "iUv"}),
+		        Value = Table.ReplaceValue( Replace,".",",",Replacer.ReplaceText,{"tMed"}),
+		        Value1 = Table.ReplaceValue(Value,".",",",Replacer.ReplaceText,{"hR"}),
+		        Value2 = Table.ReplaceValue(Value1,".",",",Replacer.ReplaceText,{"utci"}),
+		        Value3 = Table.ReplaceValue(Value2,".",",",Replacer.ReplaceText,{"ffVento"}),
+		        Value4 = Table.ReplaceValue(Value3,".",",",Replacer.ReplaceText,{"probabilidadePrecipita"}),
+		        Value5 = Table.ReplaceValue(Value4,".",",",Replacer.ReplaceText,{"tMin"}),
+		        Value6 = Table.ReplaceValue(Value5,".",",",Replacer.ReplaceText,{"tMax"}),
+		        Value7 = Table.ReplaceValue(Value6,".",",",Replacer.ReplaceText,{"iUv"}),
+		        Type2 = Table.TransformColumnTypes(Value7,{{"iUv", type number}, {"tMax", type number}, {"idFfxVento", type number}, {"tMin", type number}, {"ffVento", type number}, {"utci", type number}, {"hR", type number}, {"tMed", type number}}),
+		        filter = Table.SelectRows(Type2, each [tMin] <> null and [tMin] <> "")
+		    in
+		        filter
+	lineageTag: f8a2c94b-8a59-4865-9cec-ddaf86389b63
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+

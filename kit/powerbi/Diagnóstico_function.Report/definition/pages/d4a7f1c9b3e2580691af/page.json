@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "d4a7f1c9b3e2580691af",
+  "displayName": "Dashboard — Diagnóstico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

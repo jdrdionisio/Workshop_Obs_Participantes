@@ -1,0 +1,80 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "e5f60718293a4b5c6d7e",
+  "position": {
+    "x": 10,
+    "y": 478,
+    "z": 400,
+    "height": 234,
+    "width": 1260,
+    "tabOrder": 400
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Beneficiarios"
+                    }
+                  },
+                  "Property": "geodsg"
+                }
+              },
+              "queryRef": "Beneficiarios.geodsg",
+              "nativeQueryRef": "geodsg"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Beneficiarios"
+                    }
+                  },
+                  "Property": "dim_3_t"
+                }
+              },
+              "queryRef": "Beneficiarios.dim_3_t",
+              "nativeQueryRef": "dim_3_t"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Beneficiarios"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "Beneficiarios.Name",
+              "nativeQueryRef": "Name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Beneficiarios"
+                    }
+                  },
+                  "Property": "Percentage"
+                }
+              },
+              "queryRef": "Beneficiarios.Percentage",
+              "nativeQueryRef": "Percentage"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

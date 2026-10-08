@@ -1,0 +1,59 @@
+table pop_residente
+	lineageTag: 039b90a8-efb9-43e9-adc8-442a2fce2a22
+
+	column Name
+		dataType: string
+		lineageTag: 5c4c947b-374a-46c6-baa7-e88c186e19bc
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column geocod
+		dataType: string
+		lineageTag: c17df7da-8c8d-4d5d-abc8-9734fcab4e3a
+		summarizeBy: none
+		sourceColumn: geocod
+
+		annotation SummarizationSetBy = Automatic
+
+	column geodsg
+		dataType: string
+		lineageTag: e754a13b-d3f3-4906-8193-877c75347c1a
+		summarizeBy: none
+		sourceColumn: geodsg
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_3_t
+		dataType: string
+		lineageTag: 9d46585a-53cb-4271-a6ec-d6487d4b4f5d
+		summarizeBy: none
+		sourceColumn: dim_3_t
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor
+		dataType: string
+		lineageTag: 20b56905-34e5-482b-b57d-caa421b7f206
+		summarizeBy: none
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition pop_residente = m
+		mode: import
+		source =
+				let
+				    Source = GetINEData_NDNY("0008273"),
+				    #"Expanded Value1" = Table.ExpandRecordColumn(Source, "Value", {"geocod", "geodsg", "dim_3", "dim_3_t", "dim_4", "dim_4_t", "ind_string", "valor"}, {"geocod", "geodsg", "dim_3", "dim_3_t", "dim_4", "dim_4_t", "ind_string", "valor"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Expanded Value1",{"dim_4_t", "dim_4"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"valor", Int64.Type}}),
+				    #"Grouped Rows" = Table.Group(#"Changed Type", {"Name", "geocod", "geodsg", "dim_3_t"}, {{"valor", each List.Sum([valor]), type text}})
+				in
+				    #"Grouped Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

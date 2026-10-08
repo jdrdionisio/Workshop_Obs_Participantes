@@ -1,0 +1,105 @@
+table distrits-islands
+	excludeFromModelRefresh
+	lineageTag: 22b90777-fbbb-4b59-83cf-65bd2d0ea88e
+
+	column owner
+		dataType: string
+		lineageTag: 7ab58817-472a-40f0-a6be-3db308e01df9
+		summarizeBy: none
+		sourceColumn: owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 684b09ae-bb92-4fb2-8cdb-c49cfcc08e6c
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.idRegiao'
+		dataType: int64
+		formatString: 0
+		lineageTag: d0e91bfa-84b5-466f-aec9-a0e30226d2f9
+		summarizeBy: sum
+		sourceColumn: data.idRegiao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.idAreaAviso'
+		dataType: string
+		lineageTag: eafc55cc-3fbc-480e-9eee-a0ea5cddc0a0
+		summarizeBy: none
+		sourceColumn: data.idAreaAviso
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.idConcelho'
+		dataType: int64
+		formatString: 0
+		lineageTag: d3ad34a1-98ef-4ffc-a447-d651c7aada36
+		summarizeBy: sum
+		sourceColumn: data.idConcelho
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.globalIdLocal'
+		dataType: int64
+		formatString: 0
+		lineageTag: 55a6cbad-ebba-4a87-a1da-d60a177e58d3
+		summarizeBy: sum
+		sourceColumn: data.globalIdLocal
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.latitude'
+		dataType: string
+		lineageTag: 3cb41331-3c1c-4bf3-9a0f-6a561e5fb01d
+		summarizeBy: none
+		sourceColumn: data.latitude
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.idDistrito'
+		dataType: int64
+		formatString: 0
+		lineageTag: d5d12ff2-4828-4be9-9194-828e5962bad2
+		summarizeBy: sum
+		sourceColumn: data.idDistrito
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.local'
+		dataType: string
+		lineageTag: bfe224db-09bd-4fb9-af26-e6a1d001862f
+		summarizeBy: none
+		sourceColumn: data.local
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'data.longitude'
+		dataType: string
+		lineageTag: 85006e26-8a7b-44f5-a7aa-d8b5f062f112
+		summarizeBy: none
+		sourceColumn: data.longitude
+
+		annotation SummarizationSetBy = Automatic
+
+	partition distrits-islands = m
+		mode: import
+		source =
+				let
+				    Source = GetIPMADataR("/distrits-islands.json"),
+				    #"Converted to Table" = Table.FromRecords({Source}),
+				    #"Expanded data" = Table.ExpandListColumn(#"Converted to Table", "data"),
+				    #"Expanded data1" = Table.ExpandRecordColumn(#"Expanded data", "data", {"idRegiao", "idAreaAviso", "idConcelho", "globalIdLocal", "latitude", "idDistrito", "local", "longitude"}, {"data.idRegiao", "data.idAreaAviso", "data.idConcelho", "data.globalIdLocal", "data.latitude", "data.idDistrito", "data.local", "data.longitude"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Expanded data1",{{"owner", type text}, {"country", type text}, {"data.idRegiao", Int64.Type}, {"data.idAreaAviso", type text}, {"data.idConcelho", Int64.Type}, {"data.globalIdLocal", Int64.Type}, {"data.latitude", type text}, {"data.idDistrito", Int64.Type}, {"data.local", type text}, {"data.longitude", type text}}),
+				    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"data.globalIdLocal", Order.Ascending}})
+				in
+				    #"Sorted Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

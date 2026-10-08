@@ -1,0 +1,142 @@
+// ===========================================================================
+// nuts_vintage.pq -- Power Query M: o mesmo indicador em NUTS 2013 e NUTS 2024
+//
+// ===========================================================================
+
+
+// ---------------------------------------------------------------------------
+// 1. GetINEdata
+// ---------------------------------------------------------------------------
+let
+    GetINEdata = (Dim2Code as text, varcd as text) as table =>
+    let
+        url = "https://www.ine.pt/ine/json_indicador/pindica.jsp"
+              & "?op=2&varcd=" & varcd
+              & "&Dim2=" & Dim2Code
+              & "&lang=PT",
+        Resposta = Json.Document(Web.Contents(url)),
+        Primeiro = Resposta{0},
+        Dados    = Primeiro[Dados],
+        Anos     = Record.FieldNames(Dados),
+        // Uma linha por (ano, registo), em vez de expandir tudo de uma vez:
+        // os registos NÃO têm todos as mesmas chaves -- os suprimidos ("x")
+        // vêm sem o campo "valor".
+        Linhas = List.TransformMany(
+            Anos,
+            (ano) => Dados[ano],
+            (ano, reg) => Record.AddField(reg, "ano", Number.FromText(ano))
+        ),
+        Tabela = Table.FromRecords(
+            Linhas,
+            {"ano", "geocod", "geodsg", "dim_3", "dim_3_t", "dim_4", "dim_4_t",
+             "sinal_conv", "sinal_conv_desc", "ind_string", "valor"},
+            MissingField.UseNull
+        )
+    in
+        Tabela
+in
+    GetINEdata
+
+
+// ---------------------------------------------------------------------------
+// 2. Inclusão de dois indicadores
+// ---------------------------------------------------------------------------
+let
+    // O MESMO indicador, duas nomenclaturas:
+    VarcdNUTS2013 = "0008273",   // População residente (NUTS 2013)
+    VarcdNUTS2024 = "0012918",   // População residente (NUTS 2024)
+
+    LerMapa = (varcd as text, vintage as text) as table =>
+        let
+            url = "https://www.ine.pt/ine/json_indicador/pindica.jsp"
+                  & "?op=2&varcd=" & varcd & "&lang=PT",
+            Primeiro = Json.Document(Web.Contents(url)){0},
+            Linhas = List.TransformMany(
+                Record.FieldNames(Primeiro[Dados]),
+                (ano) => Primeiro[Dados][ano],
+                (ano, reg) => [geocod = reg[geocod], geodsg = reg[geodsg], vintage = vintage]
+            ),
+            Distintos = Table.Distinct(Table.FromRecords(Linhas))
+        in
+            Distintos,
+
+    Mapa2013 = LerMapa(VarcdNUTS2013, "NUTS 2013"),
+    Mapa2024 = LerMapa(VarcdNUTS2024, "NUTS 2024"),
+
+    // Os códigos que existem nas duas versões mas designam coisas diferentes.
+    // Validado em R: 11B "Alto Tâmega" (2013) -> "Alto Tâmega e Barroso" (2024);
+    // 3003101 "Calheta" -> "Calheta (R.A.M.)"; 2004201 "Lagoa" -> "Lagoa (R.A.A.)".
+    Colisoes = Table.Join(
+        Table.RenameColumns(Mapa2013, {{"geodsg", "geodsg_2013"}, {"vintage", "v_2013"}}),
+        {"geocod"},
+        Table.RenameColumns(Mapa2024, {{"geodsg", "geodsg_2024"}, {"vintage", "v_2024"}}),
+        {"geocod"},
+        JoinKind.Inner
+    ),
+    ColisoesReais = Table.SelectRows(
+        Colisoes,
+        each [geodsg_2013] <> [geodsg_2024]
+    ),
+
+    // Municípios cujo código muda (herda o prefixo da NUTS III).
+    // Validado em R: Alcobaça 16B1001 -> 1D11001 ; Lisboa 1701106 -> 1A01106 ;
+    // Évora 1870705 -> 1C40705 ; e 192 de 339 territórios comparáveis.
+    MudamDeCodigo = Table.Join(
+        Mapa2013,
+        {"geodsg"},
+        Mapa2024,
+        {"geodsg"},
+        JoinKind.Inner
+    ),
+    Contagem = Table.RowCount(
+        Table.SelectRows(MudamDeCodigo, each [geocod] <> [geocod_2024])
+    ),
+
+    // Aviso explícito: sem a correspondência oficial, NÃO juntar por código.
+    Aviso =
+        if Contagem > 0 then
+            "AVISO: " & Text.From(Contagem)
+            & " territórios mudam de código entre NUTS 2013 e NUTS 2024."
+            & " Uma série temporal que atravesse 2024 tem de usar a"
+            & " correspondência oficial de versões e não o código nem o nome."
+        else
+            "Sem alterações de código detetadas."
+in
+    Aviso
+
+// ---------------------------------------------------------------------------
+// 3. Extração de Tabela de múltiplos indicadores com dimensões semelhantes
+// ---------------------------------------------------------------------------
+
+let
+    Source = Table.FromRows({
+        {"1", "0012918"},
+        {"11", "0012918"},
+        {"11A", "0012918"},
+        {"11A0107", "0012918"},
+        {"11A1317", "0012918"},
+        {"1", "0008273"},
+        {"11", "0008273"},
+        {"11A", "0008273"},
+        {"11A0107", "0008273"},
+        {"11A1317", "0008273"}
+    }, {"Dim2Codes", "varcd"}),
+
+    Changed_Type = Table.TransformColumnTypes(Source,{{"varcd", type text}, {"Dim2Codes", type text}}),
+
+    Get_Data = Table.AddColumn(Changed_Type, "Data", each GetINEdata([Dim2Codes],[varcd])),
+
+    #"Data Expandida" = Table.ExpandTableColumn(Get_Data, "Data", {"Name", "Value"}, {"Data.Name", "Data.Value"}),
+
+    #"Data.Value Expandida" = Table.ExpandRecordColumn(#"Data Expandida", "Data.Value", {
+        "geodsg", "dim_3_t", "dim_4_t", "valor"
+    }, {
+        "geodsg", "dim_3_t", "dim_4_t", "valor"
+    }),
+
+    // Aqui eliminamos duplicados com base nas colunas principais
+    DadosUnicos = Table.Distinct(#"Data.Value Expandida", {
+        "Dim2Codes", "Data.Name", "dim_3_t", "dim_4_t", "valor"
+    })
+in
+    DadosUnico
